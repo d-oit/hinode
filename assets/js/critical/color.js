@@ -1,92 +1,77 @@
-{{- if site.Params.main.enableDarkMode -}}
 
-/*!
- * Color mode toggler for Bootstrap's docs (https://getbootstrap.com/)
- * Copyright 2011-2022 The Bootstrap Authors
- * Licensed under the Creative Commons Attribution 3.0 Unported License.
- */
 
-(() => {
-  'use strict'
-
-  const supportedThemes = ['auto', 'dark', 'light'];
-
-  // retrieves the currently stored theme from local storage (cookie)
-  const storedTheme = localStorage.getItem('theme')
+let selectedTheme = localStorage.getItem('themeMode') || 'auto';
+const themeIcons = {
+    light: '<path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>',
+    dark: '<path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278zM4.858 1.311A7.269 7.269 0 0 0 1.025 7.71c0 4.02 3.279 7.276 7.319 7.276a7.316 7.316 0 0 0 5.205-2.162c-.337.042-.68.063-1.029.063-4.61 0-8.343-3.714-8.343-8.29 0-1.167.242-2.278.681-3.286z"/>',
+    auto: '<path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>'
+};
 
   // retrieves the theme preferred by the client, defaults to light
-  function getPreferredTheme() {
+function getPreferredTheme() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   }
 
-  // retrieves the current theme, either from local storage or client's preferences
-  function getTheme() {
-    if (storedTheme) {
-      return storedTheme
-    } else {
-      const preference = getPreferredTheme()
-      localStorage.setItem('theme', preference)
-      return preference
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (storedTheme !== 'light' || storedTheme !== 'dark') {
+        selectTheme(getPreferredTheme())
     }
-  }
+  })
+
+  function updateThemeDisplay(theme) {
+    const currentThemeIcon = document.getElementById('currentThemeIcon');
+    currentThemeIcon.innerHTML = themeIcons[theme];
+}
+
+function selectTheme(theme) {
+    selectedTheme = theme;
+    updateThemeDisplay(theme);
+    const options = document.querySelectorAll('.theme-option');
+    options.forEach(option => {
+        if (option.dataset.theme === theme) {
+            option.classList.add('active');
+            option.querySelector('.save-icon').classList .replace('d-none', 'd-inline-block');
+        } else {
+            option.classList.remove('active');
+            option.querySelector('.save-icon').classList.replace('d-inline-block', 'd-none');
+        }
+    });
+    setTheme(theme);
+}
 
   // applies and stores requested theme
   function setTheme(theme) {
-    if (!supportedThemes.includes(theme)) {
-      theme = 'auto'
-    }
-    localStorage.setItem('theme', theme)
 
     if (theme === 'auto') {
       document.documentElement.setAttribute('data-bs-theme', (getPreferredTheme()))
     } else {
       document.documentElement.setAttribute('data-bs-theme', theme)
     }
-
-    document.querySelectorAll('.navbar-mode-selector').forEach(chk => {
-      chk.checked = (document.documentElement.getAttribute('data-bs-theme') === 'light')
-    })
   }
 
-  // alternates the currently active theme
-  function toggleTheme() {
-    const target = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark'
-    setTheme(target)
-  }
+window.addEventListener('DOMContentLoaded', () => {
+    selectTheme(selectedTheme);
 
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if (storedTheme !== 'light' || storedTheme !== 'dark') {
-      setTheme(getPreferredTheme())
-    }
-  })
+    const options = document.querySelectorAll('.theme-option');
+    options.forEach(option => {
+        option.addEventListener('click', (e) => {
+            const theme = option.dataset.theme;
+            if (e.target.classList.contains('save-icon')) {
+                setTheme(theme);
+                localStorage.setItem('themeMode', theme);
+            } else {
+                selectTheme(theme);
+            }
+        });
+    });
 
-  window.addEventListener('DOMContentLoaded', () => {
-    setTheme(getTheme())
-    const light = (document.documentElement.getAttribute('data-bs-theme') === 'light')
 
-    document.querySelectorAll('.ball').forEach(ball => {
-      ball.classList.add('notransition');
-    })
-    
-    document.querySelectorAll('.navbar-mode-selector').forEach(chk => {
-      chk.checked = light
-      chk.addEventListener('change', function () {
-        toggleTheme()
-      })
-    })
+})
 
-    document.querySelectorAll('.ball').forEach(ball => {
-      ball.offsetHeight; // flush css changes
-      ball.classList.remove('notransition');
-    })
-  })
 
-  window.addEventListener('load', () => {
-    const light = (document.documentElement.getAttribute('data-bs-theme') === 'light')
-    document.querySelectorAll('.navbar-mode-selector').forEach(chk => {
-      chk.checked = light
-    })
-  });  
-})()
+// Initialize
 
-{{- end -}}
+//selectTheme(selectedTheme);
+
+
+

@@ -23,6 +23,22 @@
   translation: "Artikel"
 - id: more
   translation: "Weitere {{ . }}"
+- id: emptyList
+  translation: "Keine weiteren Artikel gefunden"
+- id: emptyTags
+  translation: "Keine Schlagworte gefunden"
+- id: readMore
+  translation: "Weiterlesen"
+
+# Languages
+- id: lang_de
+  translation: "Deutsch"
+- id: lang_en
+  translation: "Englisch"
+- id: lang_nl
+  translation: "Niederländisch"
+- id: lang_fr
+  translation: "Französisch"
 
 # Sharing
 - id: shareLink
@@ -110,6 +126,32 @@
 
 # Comments
 - id: show
-  translation: "Zeige"
+  translation: "Anzeigen"
 - id: comments
   translation: "Kommentare"
+
+# Arguments
+- id: name
+  translation: "Name"
+- id: type
+  translation: "Typ"
+- id: required
+  translation: "Erforderlich"
+- id: default
+  translation: "Standard"
+- id: comment
+  translation: "Kommentar"
+- id: supportedValues
+  translation: "Unterstützte Werte"
+
+# Alerts
+- id: caution
+  translation: Vorsicht
+- id: important
+  translation: Wichtig
+- id: note
+  translation: Hinweis
+- id: tip
+  translation: Tipp
+- id: warning
+  translation: Warnung
